@@ -1,0 +1,44 @@
+###
+@url=http://localhost:8080
+@game=ticTacToe
+@user_id=736ea2d6-4331-46ac-85c2-4a48bc350bb3
+@game_id=7b0addf4-5228-424e-893c-7a5c3e1bb0e9
+
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### GET catalog
+GET {{url}}/catalog
+
+### GET all games
+GET {{url}}/games
+
+### GET specific game
+GET {{url}}/games/{{game_id}}
+
+### GET allowed moves
+GET {{url}}/games/{{game_id}}/moves?avaible=true
+
+### POST play move
+POST {{url}}/games/{{game_id}}/moves
+Content-Type: application/json
+
+{
+  "x": 0,
+  "y": 2
+}
+
+
+### POST new game
+POST {{url}}/games
+X-UserId: {{user_id}}
+Content-Type: application/json
+
+{
+  "gameType" : "TicTacToe",
+  "playerCount": 2,
+  "boardSize": 3
+}
+
+

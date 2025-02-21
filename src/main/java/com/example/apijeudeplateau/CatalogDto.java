@@ -1,4 +1,7 @@
 package com.example.apijeudeplateau;
 
-public class CatalogDto {
+import java.util.ArrayList;
+
+public record CatalogDto(ArrayList<String> catalog) {
 }
+

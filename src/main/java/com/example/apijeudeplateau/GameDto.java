@@ -1,4 +1,4 @@
 package com.example.apijeudeplateau;
 
-public record GameDto() {
+public record GameDto(String id, String gameType) {
 }

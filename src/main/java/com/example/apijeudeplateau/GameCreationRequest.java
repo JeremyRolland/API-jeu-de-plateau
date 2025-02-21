@@ -1,4 +1,9 @@
 package com.example.apijeudeplateau;
 
-public class GameCreationRequest {
-}
+import jakarta.validation.constraints.NotNull;
+
+public record GameCreationRequest(
+        @NotNull String gameType,
+        @NotNull Integer playerCount,
+        @NotNull Integer boardSize
+) {}
