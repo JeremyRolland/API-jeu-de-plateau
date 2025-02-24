@@ -17,38 +17,54 @@ public class GameServiceImpl implements GameService {
     private GameDao gameDao;
 
     @Override
-    public GameDto createGame(GameCreationRequest request) {
+    public GameDto createGame(GameCreationRequest request, UUID userId) {
+        Set<UUID> playersIDs = new HashSet<>();
+        playersIDs.add(userId);
         GameFactory gameFactory = switch (request.gameType()) {
-            case "TicTacToe" -> new TicTacToeGameFactory();
+            case "TicTacToe" -> {
+                playersIDs.add(UUID.randomUUID());
+                yield new TicTacToeGameFactory();
+            }
             case "Taquin" -> new TaquinGameFactory();
-            case "ConnectFour" -> new ConnectFourGameFactory();
+            case "ConnectFour" -> {
+                playersIDs.add(UUID.randomUUID());
+                yield new ConnectFourGameFactory();
+            }
             default -> throw new IllegalArgumentException("Unknown game type: " + request.gameType());
         };
-        Game game = gameDao.upsert(gameFactory.createGame(request.playerCount(), request.boardSize()));
+        Game game = gameDao.upsert(gameFactory.createGame(request.boardSize(), playersIDs));
         gameDao.upsert(game);
-        return new GameDto(game.getId().toString(), game.getFactoryId());
+        return new GameDto(game.getId().toString(), game.getFactoryId(), game.getPlayerIds(), game.getCurrentPlayerId());
     }
 
     @Override
-    public GameDto getGameById(UUID id) {
-        Optional<Game> game = gameDao.findById(id);
-        return new GameDto(game.get().getId().toString(), game.get().getFactoryId());
+    public GameDto getGameById(UUID gameId, UUID userId) {
+        Optional<Game> gameOptional = gameDao.findById(gameId);
+        if (gameOptional.isPresent()) {
+            Game game = gameOptional.get();
+            if (game.getPlayerIds().contains(userId)) {
+                return new GameDto(gameId.toString(), game.getFactoryId(), game.getPlayerIds(), game.getCurrentPlayerId());
+            }
+        }
+        return null;
     }
 
     @Override
-    public void moveTo(UUID id, CellPosition request) {
+    public void moveTo(UUID gameId, CellPosition request, UUID userId) {
         // Trouver le jeu par ID
-        Game game = gameDao.findById(id).orElseThrow(() -> new IllegalArgumentException("Game not found"));
-
-
-        // Récupérer les tokens restants pour le joueur courant
-        Token tokenToMove = game.getRemainingTokens()
+        Optional<Game> optionalGame = gameDao.findById(gameId);
+        if (optionalGame.isEmpty()) {
+            return;
+        }
+        Game game = optionalGame.get();
+        Optional<Token> optionalTokenToMove = game.getRemainingTokens()
                 .stream()
-                .filter(token -> token.getOwnerId().orElse(null).equals(game.getCurrentPlayerId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Token not found for the current player"));
-
-        // Tenter de déplacer le token
+                .filter(token -> Objects.equals(token.getOwnerId().orElse(null), userId))
+                .findFirst();
+        if (optionalTokenToMove.isEmpty()) {
+            return;
+        }
+        Token tokenToMove = optionalTokenToMove.get();
         try {
             tokenToMove.moveTo(request);
             gameDao.upsert(game);
@@ -58,21 +74,22 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Set<CellPosition> getAllowedMoves(UUID id) {
-       return gameDao.findById(id).get()
-                .getRemainingTokens()
-                .stream()
-                .map(Token::getAllowedMoves)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+    public Set<CellPosition> getAllowedMoves(UUID gameId, UUID userId) {
+        return gameDao.findById(gameId)
+                .filter(game -> game.getPlayerIds().contains(userId))
+                .map(game -> game.getRemainingTokens().stream()
+                        .map(Token::getAllowedMoves)
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet()))
+                .orElse(null);
     }
 
     @Override
-    public List<GameDto> findGamesByStatus(GameStatus status) {
+    public List<GameDto> findGamesByStatus(GameStatus status, UUID userId) {
         return gameDao.findAll()
                 .stream()
-                .filter(game -> status.equals(game.getStatus()))
-                .map(game -> new GameDto(game.getId().toString(), game.getFactoryId()))
+                .filter(game -> status.equals(game.getStatus()) && game.getPlayerIds().contains(userId))
+                .map(game -> new GameDto(game.getId().toString(), game.getFactoryId(), game.getPlayerIds(), game.getCurrentPlayerId()))
                 .collect(Collectors.toList());
     }
 

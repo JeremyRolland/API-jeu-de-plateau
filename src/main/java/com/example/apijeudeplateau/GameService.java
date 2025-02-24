@@ -8,9 +8,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface GameService {
-    GameDto createGame(GameCreationRequest request);
-    GameDto getGameById(UUID id);
-    void moveTo(UUID id, CellPosition request);
-    Set<CellPosition> getAllowedMoves(UUID id);
-    List<GameDto> findGamesByStatus(GameStatus status);
+    GameDto createGame(GameCreationRequest request, UUID userId);
+    GameDto getGameById(UUID gameId, UUID userId);
+    void moveTo(UUID gameId, CellPosition request, UUID userId);
+    Set<CellPosition> getAllowedMoves(UUID gameId, UUID userId);
+    List<GameDto> findGamesByStatus(GameStatus status, UUID userId);
 }

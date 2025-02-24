@@ -3,11 +3,9 @@ package com.example.apijeudeplateau;
 import fr.le_campus_numerique.square_games.engine.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class GameController {
@@ -19,37 +17,54 @@ public class GameController {
     public GameDto createGame(
             @RequestBody GameCreationRequest request,
             @RequestHeader("X-UserId") UUID userId) {
-        return gameService.createGame(request);
+        return gameService.createGame(request, userId);
     }
 
-    @GetMapping("games")
-    public Collection<GameDto> getAllGames(@RequestParam(required = false) String status) {
+    @GetMapping("/games")
+    public Collection<GameDto> getAllGames(
+            @RequestParam(required = false) String status,
+            @RequestHeader("X-UserId") UUID userId) {
         boolean is_status_valid = Arrays.stream(GameStatus.values()).distinct()
                 .filter(s->s.name().equalsIgnoreCase(status))
                 .count()>0;
         if(is_status_valid) {
-            return gameService.findGamesByStatus(GameStatus.valueOf(status.toUpperCase()));
+            return gameService.findGamesByStatus(GameStatus.valueOf(status.toUpperCase()), userId);
         }
-        return gameService.findGamesByStatus(GameStatus.ONGOING);
+        return null;
     }
 
     @GetMapping("/games/{gameId}")
-    public GameDto getGame(@PathVariable UUID gameId) {
-        return gameService.getGameById(gameId);
+    public GameDto getGame(@PathVariable UUID gameId,
+                           @RequestHeader("X-UserId") UUID userId) {
+        return gameService.getGameById(gameId, userId);
     }
 
     @GetMapping("/games/{gameId}/moves")
     public Collection<CellPosition> getAllowedMoves(
             @PathVariable UUID gameId,
-            @RequestParam(required = false) Boolean avaible){
+            @RequestParam(required = false) Boolean avaible,
+            @RequestHeader("X-UserId") UUID userId){
         if(avaible != null && avaible) {
-            return gameService.getAllowedMoves(gameId);
+            return gameService.getAllowedMoves(gameId, userId);
         }
         return new ArrayList<>();
     }
 
-    @PostMapping("/games/{gameId}/moves")
-    public void moveTo(@RequestBody CellPosition request, @PathVariable UUID gameId) {
-        gameService.moveTo(gameId, request);
+    @PutMapping("/games/{gameId}/moves")
+    public void moveTo(@RequestBody CellPosition request,
+                       @PathVariable UUID gameId,
+                       @RequestHeader("X-UserId") UUID userId) {
+        gameService.moveTo(gameId, request, userId);
     }
+
+    private final RestClient restClient= RestClient.create();
+
+    @GetMapping("/users/{userId}")
+    public UserDto getUsers(@RequestHeader("X-UserId") UUID userId) {
+        return  restClient.get()
+                .uri("http://localhost:8081/users/{userId}", userId)
+                .retrieve()
+                .body(UserDto.class);
+    }
+
 }

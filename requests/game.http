@@ -1,8 +1,9 @@
-###
+### Variables
 @url=http://localhost:8080
+@url_user=http://localhost:8081
 @game=ticTacToe
-@user_id=736ea2d6-4331-46ac-85c2-4a48bc350bb3
-@game_id=7b0addf4-5228-424e-893c-7a5c3e1bb0e9
+@user_id=936900c9-1d18-4644-8a4e-9db983fd2157
+@game_id=b3148d3a-1ad8-45e9-aa43-0e052b40213a
 
 ### GET request to example server
 GET https://examples.http-client.intellij.net/get
@@ -12,21 +13,29 @@ GET https://examples.http-client.intellij.net/get
 GET {{url}}/catalog
 
 ### GET all games
-GET {{url}}/games
+GET {{url}}/games?status=ONGOING
+X-UserId: {{user_id}}
 
 ### GET specific game
 GET {{url}}/games/{{game_id}}
+X-UserId: {{user_id}}
 
 ### GET allowed moves
 GET {{url}}/games/{{game_id}}/moves?avaible=true
+X-UserId: {{user_id}}
+
+### GET user by id
+GET {{url}}/users/{{user_id}}
+X-UserId: {{user_id}}
 
 ### POST play move
 POST {{url}}/games/{{game_id}}/moves
+X-UserId: {{user_id}}
 Content-Type: application/json
 
 {
-  "x": 0,
-  "y": 2
+  "x": 2,
+  "y": 0
 }
 
 

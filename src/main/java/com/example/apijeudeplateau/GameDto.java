@@ -1,4 +1,7 @@
 package com.example.apijeudeplateau;
 
-public record GameDto(String id, String gameType) {
+import java.util.Set;
+import java.util.UUID;
+
+public record GameDto(String gameId, String gameType, Set<UUID> playersIds, UUID currentPlayerId) {
 }
