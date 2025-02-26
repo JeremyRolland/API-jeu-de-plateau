@@ -1,4 +1,4 @@
-package com.example.apijeudeplateau;
+package com.example.apijeudeplateau.controller;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.example.apijeudeplateau;
+package com.example.apijeudeplateau.persistance;
 
 import jakarta.validation.constraints.NotNull;
 

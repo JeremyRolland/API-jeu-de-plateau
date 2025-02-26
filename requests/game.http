@@ -2,8 +2,9 @@
 @url=http://localhost:8080
 @url_user=http://localhost:8081
 @game=ticTacToe
-@user_id=936900c9-1d18-4644-8a4e-9db983fd2157
-@game_id=b3148d3a-1ad8-45e9-aa43-0e052b40213a
+@user_id_1=e49c7927-6a5b-4d96-b1d6-1f7d34b86ac5
+@user_id_2=d479c46f-731e-4be8-bef1-76db671401de
+@game_id=609e1c94-4029-4cf5-9ca8-3940ae02e537
 
 ### GET request to example server
 GET https://examples.http-client.intellij.net/get
@@ -12,25 +13,36 @@ GET https://examples.http-client.intellij.net/get
 ### GET catalog
 GET {{url}}/catalog
 
+### POST new game
+POST {{url}}/games
+X-UserId: {{user_id_1}}
+Content-Type: application/json
+
+{
+  "gameType" : "tictactoe",
+  "playerCount": 2,
+  "boardSize": 3
+}
+
 ### GET all games
 GET {{url}}/games?status=ONGOING
-X-UserId: {{user_id}}
+X-UserId: {{user_id_1}}
 
 ### GET specific game
 GET {{url}}/games/{{game_id}}
-X-UserId: {{user_id}}
+X-UserId: {{user_id_1}}
 
 ### GET allowed moves
 GET {{url}}/games/{{game_id}}/moves?avaible=true
-X-UserId: {{user_id}}
+X-UserId: {{user_id_1}}
 
 ### GET user by id
-GET {{url}}/users/{{user_id}}
-X-UserId: {{user_id}}
+GET {{url}}/users/{{user_id_1}}
+X-UserId: {{user_id_1}}
 
-### POST play move
-POST {{url}}/games/{{game_id}}/moves
-X-UserId: {{user_id}}
+### PUT play move joueur1
+PUT {{url}}/games/{{game_id}}/moves
+X-UserId: {{user_id_1}}
 Content-Type: application/json
 
 {
@@ -38,16 +50,17 @@ Content-Type: application/json
   "y": 0
 }
 
-
-### POST new game
-POST {{url}}/games
-X-UserId: {{user_id}}
+### PUT play move joueur2
+PUT {{url}}/games/{{game_id}}/moves
+X-UserId: {{user_id_2}}
 Content-Type: application/json
 
 {
-  "gameType" : "TicTacToe",
-  "playerCount": 2,
-  "boardSize": 3
+  "x": 1,
+  "y": 1
 }
+
+
+
 
 

@@ -1,6 +1,8 @@
-package com.example.apijeudeplateau;
+package com.example.apijeudeplateau.controller;
 
+import com.example.apijeudeplateau.service.GameService;
 import fr.le_campus_numerique.square_games.engine.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
@@ -8,6 +10,7 @@ import org.springframework.web.client.RestClient;
 import java.util.*;
 
 @RestController
+@Transactional
 public class GameController {
 
     @Autowired

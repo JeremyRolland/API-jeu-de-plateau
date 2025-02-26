@@ -1,5 +1,6 @@
-package com.example.apijeudeplateau;
+package com.example.apijeudeplateau.service;
 
+import com.example.apijeudeplateau.persistance.CatalogDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

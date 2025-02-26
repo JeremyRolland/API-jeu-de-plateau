@@ -1,10 +1,16 @@
-package com.example.apijeudeplateau;
+package com.example.apijeudeplateau.service;
 
+import com.example.apijeudeplateau.controller.GameCreationRequest;
+import com.example.apijeudeplateau.persistance.GameDao;
+import com.example.apijeudeplateau.controller.GameDto;
+import com.example.apijeudeplateau.persistance.GameEntity;
+import com.example.apijeudeplateau.persistance.GameTokenEntity;
 import fr.le_campus_numerique.square_games.engine.*;
 import fr.le_campus_numerique.square_games.engine.connectfour.ConnectFourGameFactory;
 import fr.le_campus_numerique.square_games.engine.taquin.TaquinGameFactory;
 import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class GameServiceImpl implements GameService {
 
+    @Qualifier("jpaGameDao")
     @Autowired
     private GameDao gameDao;
 
@@ -21,19 +28,18 @@ public class GameServiceImpl implements GameService {
         Set<UUID> playersIDs = new HashSet<>();
         playersIDs.add(userId);
         GameFactory gameFactory = switch (request.gameType()) {
-            case "TicTacToe" -> {
+            case "tictactoe" -> {
                 playersIDs.add(UUID.randomUUID());
                 yield new TicTacToeGameFactory();
             }
-            case "Taquin" -> new TaquinGameFactory();
-            case "ConnectFour" -> {
+            case "taquin" -> new TaquinGameFactory();
+            case "connectfour" -> {
                 playersIDs.add(UUID.randomUUID());
                 yield new ConnectFourGameFactory();
             }
             default -> throw new IllegalArgumentException("Unknown game type: " + request.gameType());
         };
         Game game = gameDao.upsert(gameFactory.createGame(request.boardSize(), playersIDs));
-        gameDao.upsert(game);
         return new GameDto(game.getId().toString(), game.getFactoryId(), game.getPlayerIds(), game.getCurrentPlayerId());
     }
 
@@ -87,7 +93,6 @@ public class GameServiceImpl implements GameService {
     @Override
     public List<GameDto> findGamesByStatus(GameStatus status, UUID userId) {
         return gameDao.findAll()
-                .stream()
                 .filter(game -> status.equals(game.getStatus()) && game.getPlayerIds().contains(userId))
                 .map(game -> new GameDto(game.getId().toString(), game.getFactoryId(), game.getPlayerIds(), game.getCurrentPlayerId()))
                 .collect(Collectors.toList());

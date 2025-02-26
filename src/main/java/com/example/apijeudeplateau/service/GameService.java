@@ -1,5 +1,7 @@
-package com.example.apijeudeplateau;
+package com.example.apijeudeplateau.service;
 
+import com.example.apijeudeplateau.controller.GameCreationRequest;
+import com.example.apijeudeplateau.controller.GameDto;
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.GameStatus;
 
