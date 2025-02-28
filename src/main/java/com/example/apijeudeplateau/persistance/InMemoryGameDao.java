@@ -1,7 +1,5 @@
 package com.example.apijeudeplateau.persistance;
 
-import fr.le_campus_numerique.square_games.engine.Game;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -10,22 +8,23 @@ import java.util.stream.Stream;
 @Repository
 public class InMemoryGameDao implements GameDao {
 
-    private final List<Game> games = new ArrayList<>();
+    private final List<GameEntity> games = new ArrayList<>();
 
     @Override
-    public Stream<Game> findAll() {
+    public Stream<GameEntity> findAll() {
         return games.stream();
     }
 
     @Override
-    public Optional<Game> findById(UUID id) {
+    public Optional<GameEntity> findById(UUID id) {
         return games.stream().filter(g -> g.getId().equals(id)).findFirst();
     }
 
-    public Game upsert(@NotNull Game game) {
-        games.removeIf(existingGame -> existingGame.getId().equals(game.getId()));
-        games.add(game);
-        return game;
+    public void upsert(Optional<GameEntity> gameEntityOptional) {
+        gameEntityOptional.ifPresent(gameEntity -> {
+            games.removeIf(existingGame -> existingGame.getId().equals(gameEntity.id));
+            games.add(gameEntity);
+        });
     }
 
     @Override

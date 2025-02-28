@@ -2,8 +2,9 @@ package com.example.apijeudeplateau.controller;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.util.OptionalInt;
+
 public record GameCreationRequest(
         @NotNull String gameType,
-        @NotNull Integer playerCount,
-        @NotNull Integer boardSize
+        @NotNull OptionalInt boardSize
 ) {}

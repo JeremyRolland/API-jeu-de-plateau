@@ -1,10 +1,9 @@
 ### Variables
 @url=http://localhost:8080
 @url_user=http://localhost:8081
-@game=ticTacToe
-@user_id_1=e49c7927-6a5b-4d96-b1d6-1f7d34b86ac5
-@user_id_2=d479c46f-731e-4be8-bef1-76db671401de
-@game_id=609e1c94-4029-4cf5-9ca8-3940ae02e537
+@user_id_1=9a1e9938-2025-4171-ad73-76f550cbea70
+@user_id_2=cf3ee0f9-04d4-43a2-bcb7-9b5c00cf3156
+@game_id=e41b49c1-d9ed-4ede-9e18-c0f6a2d0362c
 
 ### GET request to example server
 GET https://examples.http-client.intellij.net/get
@@ -12,15 +11,38 @@ GET https://examples.http-client.intellij.net/get
 
 ### GET catalog
 GET {{url}}/catalog
+Accept-Language: fr
 
-### POST new game
+### POST new connectFour
 POST {{url}}/games
 X-UserId: {{user_id_1}}
+Accept-Language: fr
+Content-Type: application/json
+
+{
+  "gameType" : "connectFour",
+  "boardSize": 7
+}
+
+### POST new taquin
+POST {{url}}/games
+X-UserId: {{user_id_1}}
+Accept-Language: fr
+Content-Type: application/json
+
+{
+  "gameType" : "15 puzzle",
+  "boardSize": 4
+}
+
+### POST new tictactoe
+POST {{url}}/games
+X-UserId: {{user_id_1}}
+Accept-Language: fr
 Content-Type: application/json
 
 {
   "gameType" : "tictactoe",
-  "playerCount": 2,
   "boardSize": 3
 }
 
@@ -36,10 +58,6 @@ X-UserId: {{user_id_1}}
 GET {{url}}/games/{{game_id}}/moves?avaible=true
 X-UserId: {{user_id_1}}
 
-### GET user by id
-GET {{url}}/users/{{user_id_1}}
-X-UserId: {{user_id_1}}
-
 ### PUT play move joueur1
 PUT {{url}}/games/{{game_id}}/moves
 X-UserId: {{user_id_1}}
@@ -47,7 +65,7 @@ Content-Type: application/json
 
 {
   "x": 2,
-  "y": 0
+  "y": 2
 }
 
 ### PUT play move joueur2
@@ -56,11 +74,10 @@ X-UserId: {{user_id_2}}
 Content-Type: application/json
 
 {
-  "x": 1,
-  "y": 1
+  "x": 0,
+  "y": 2
 }
 
-
-
-
-
+### GET user by id
+GET {{url}}/users/{{user_id_1}}
+X-UserId: {{user_id_1}}

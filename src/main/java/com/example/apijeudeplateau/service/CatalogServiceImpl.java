@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 @Service
 public class CatalogServiceImpl implements CatalogService {
@@ -13,7 +14,11 @@ public class CatalogServiceImpl implements CatalogService {
     private CatalogDao catalogDao;
 
     @Override
-    public ArrayList<String> findAll() {
-         return catalogDao.findAll();
+    public ArrayList<String> findAll(Locale language) {
+        ArrayList<String> list = new ArrayList<>();
+        for(GamePlugin element : catalogDao.findAll()) {
+            list.add(element.getName(language));
+        }
+        return list;
     }
 }

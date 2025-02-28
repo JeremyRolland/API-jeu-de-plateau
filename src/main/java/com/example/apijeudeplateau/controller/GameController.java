@@ -1,13 +1,18 @@
 package com.example.apijeudeplateau.controller;
 
-import com.example.apijeudeplateau.service.GameService;
+import com.example.apijeudeplateau.service.*;
 import fr.le_campus_numerique.square_games.engine.*;
 import jakarta.transaction.Transactional;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cglib.core.Local;
+import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 @RestController
 @Transactional
@@ -19,7 +24,7 @@ public class GameController {
     @PostMapping("/games")
     public GameDto createGame(
             @RequestBody GameCreationRequest request,
-            @RequestHeader("X-UserId") UUID userId) {
+            @RequestHeader("X-UserId") UUID userId) {;
         return gameService.createGame(request, userId);
     }
 
@@ -54,10 +59,10 @@ public class GameController {
     }
 
     @PutMapping("/games/{gameId}/moves")
-    public void moveTo(@RequestBody CellPosition request,
+    public void makeMove(@RequestBody CellPosition request,
                        @PathVariable UUID gameId,
                        @RequestHeader("X-UserId") UUID userId) {
-        gameService.moveTo(gameId, request, userId);
+        gameService.makeMove(gameId, request, userId);
     }
 
     private final RestClient restClient= RestClient.create();
